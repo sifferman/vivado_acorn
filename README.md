@@ -76,7 +76,7 @@ To install the driver just run the following:
 
 ```bash
 git clone git@github.com:Xilinx/dma_ip_drivers.git
-cd dma_ip_drivers/tree/master/XDMA/linux-kernel
+cd dma_ip_drivers/XDMA/linux-kernel
 make
 sudo make install
 ```
