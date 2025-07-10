@@ -77,8 +77,9 @@ To install the driver just run the following:
 ```bash
 git clone git@github.com:Xilinx/dma_ip_drivers.git
 cd dma_ip_drivers/XDMA/linux-kernel/xdma
-make
-sudo make install
+make -C /lib/modules/$(uname -r)/build M=$PWD modules
+sudo make -C /lib/modules/$(uname -r)/build M=$PWD modules_install
+sudo depmod -a
 ```
 
 If `make` fails due to a missing Makefile, you may have to install your Linux kernel's build files and headers with the following:
@@ -90,8 +91,6 @@ sudo apt install linux-headers-$(uname -r)
 Now, you should be all set to load the driver module and connect to the FPGA via the XDMA IP.
 
 ```bash
-su -
-
 # unload driver (if needed)
 rmmod xdma
 # load driver
@@ -101,23 +100,23 @@ modprobe xdma
 dmesg | grep -i xdma
 lspci | grep -i Xilinx
 ls /dev/xdma*
-
 ```
 
 ### Example Transfers
 
 ```bash
 cd dma_ip_drivers/XDMA/linux-kernel/tools
+make
 
 # Transfer 8KB to 0x0
 dd if=/dev/urandom of=TEST8K bs=8192 count=1
-./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((8*1024)) -f TEST8K
-./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((8*1024)) --file RECV8K
+sudo ./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((8*1024)) -f TEST8K
+sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((8*1024)) --file RECV8K
 cmp -b TEST8K RECV8K
 
 # Transfer 512M to 0x0
 dd if=/dev/urandom of=TEST512M bs=1M count=512
-./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((512*1024*1024)) -f TEST512M
-./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((512*1024*1024)) --file RECV512M
+sudo ./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((512*1024*1024)) -f TEST512M
+sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((512*1024*1024)) --file RECV512M
 cmp -b TEST512M RECV512M
 ```
