@@ -119,4 +119,7 @@ dd if=/dev/urandom of=TEST512M bs=1M count=512
 sudo ./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((512*1024*1024)) -f TEST512M
 sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((512*1024*1024)) --file RECV512M
 cmp -b TEST512M RECV512M
+
+# Test bd/pcie_mm2s_rtl.tcl
+source xdma_helpers.sh && test_pcie_mm2s_rtl beefcafe
 ```

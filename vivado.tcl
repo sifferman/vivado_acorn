@@ -11,6 +11,7 @@ create_project acorn $project_name/ -part xc7a100tfgg484
 
 add_files -norecurse {
     ../axi_const_rd.v
+    ../axi_mm2s_test.v
 }
 
 add_files -fileset constrs_1 -norecurse {
