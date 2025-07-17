@@ -1,8 +1,41 @@
-#!/usr/bin/env bash
+
 export C2H_DEVICE=/dev/xdma0_c2h_0
 export H2C_DEVICE=/dev/xdma0_h2c_0
 
-# Word size hard coded to 4 bytes
+xdma_c2h_file() {
+  local addr=$1 file=$2 size=$3
+
+  tmp=$(mktemp /tmp/c2h.XXXXXX)
+  rm $tmp
+  sudo "$(which dma_from_device)" \
+    --device "$C2H_DEVICE" \
+    --address "$addr" \
+    --size "$size" \
+    --file "$tmp" > /dev/null
+  local rc=$?
+  if (( rc != 0 )); then
+    sudo rm -f "$tmp"
+    return $rc
+  fi
+
+  local owner=${SUDO_USER:-$USER}
+  sudo chown "$owner":"$owner" "$tmp"
+  sudo chmod 644 "$tmp"
+  mv "$tmp" "$file"
+}
+
+xdma_h2c_file() {
+  local addr=$1 file=$2
+
+  local size
+  size=$(stat -c%s "$file")
+
+  sudo "$(which dma_to_device)" \
+    --device "$H2C_DEVICE" \
+    --address "$addr" \
+    --size "$size" \
+    -f "$file" > /dev/null
+}
 
 xdma_c2h_4() {
   local addr=$1 size=4 tmp
@@ -11,7 +44,7 @@ xdma_c2h_4() {
   sudo "$(which dma_from_device)" --device "$C2H_DEVICE" \
        --address "$addr" --size "$size" --file "$tmp" > /dev/null
   local rc=$?
-  sudo hexdump -v -e '1/4 "%08x "' "$tmp"
+  hexdump -v -e '1/4 "%08x "' "$tmp"
   echo
   sudo rm -f "$tmp"
   return $rc
@@ -47,10 +80,43 @@ xdma_h2c_4() {
   sudo "$(which dma_to_device)" --device "$H2C_DEVICE" \
        --address "$addr" --size "$size" -f "$tmp"  > /dev/null
   local rc=$?
-  sudo rm -f "$tmp"
+  rm -f "$tmp"
   return $rc
 }
 
+test_pcie_bram() {
+  dd if=/dev/urandom of=TEST8K bs=$((8*1024)) count=1
+  xdma_h2c_file 0x0 TEST8K
+  xdma_c2h_file 0x0 RECV8K $((8*1024))
+  cmp -b TEST8K RECV8K
+  rm -rf TEST8K RECV8K
+}
+
+test_pcie_ddr3() {
+  dd if=/dev/urandom of=TEST512M bs=$((512*1024*1024)) count=1
+  xdma_h2c_file 0x0 TEST512M
+  xdma_c2h_file 0x0 RECV512M $((512*1024*1024))
+  cmp -b TEST512M RECV512M
+  rm -rf TEST512M RECV512M
+}
+
+test_pcie_ddr3_rtl() {
+  dd if=/dev/urandom of=TEST512M bs=$((512*1024*1024)) count=1
+  xdma_h2c_file 0x0 TEST512M
+  xdma_c2h_file 0x0 RECV512M $((512*1024*1024))
+  cmp -b TEST512M RECV512M
+  rm -rf TEST512M RECV512M
+
+  expected="beefcafe"
+  received=$(xdma_c2h_4 0x80000000 | tr -d ' \n')
+  if [[ "$received" == "$expected" ]]; then
+    echo "PASS: received $received"
+  else
+    echo "FAIL: expected $expected, received $received"
+  fi
+}
+
+# Xilinx AXI MM2S FIFO IP
 # https://docs.amd.com/r/en-US/pg080-axi-fifo-mm-s/Programing-Sequence
 
 # Register offsets from C_BASEADDR
@@ -67,9 +133,11 @@ RDR_OFFSET=0x30  # Receive Destination
 xdma_mm2s_setup() {
   local base=$1
 
-  echo Read interrupt status register \(indicates transmit reset complete and receive reset complete\) \(01D00000\)
+  echo Reset \(missing from documentation\)
   xdma_h2c_4 $((base + TDFR_OFFSET)) a5
   xdma_h2c_4 $((base + SRR_OFFSET)) a5
+
+  echo Read interrupt status register \(indicates transmit reset complete and receive reset complete\) \(01D00000\)
   xdma_c2h_4 $((base + ISR_OFFSET))
   echo Write to clear reset done interrupt bits
   xdma_h2c_4 $((base + ISR_OFFSET)) FFFFFFFF
@@ -108,13 +176,18 @@ xdma_mm2s_transmit_4() {
   xdma_c2h_4 $((base + ISR_OFFSET))
   echo Read the transmit FIFO vacancy \(000001FC\)
   xdma_c2h_4 $((base + TDFV_OFFSET))
-
 }
 
 test_pcie_mm2s_rtl() {
-  local word=$1
+  local word="${1:-deadbeef}"
   xdma_mm2s_setup 0x0
   xdma_mm2s_transmit_4 0x0 $word
   echo Data from Internal register:
-  xdma_c2h_4 0x80000000
+  expected=$word
+  received=$(xdma_c2h_4 0x80000000 | tr -d ' \n')
+  if [[ "$received" == "$expected" ]]; then
+    echo "PASS: received $received"
+  else
+    echo "FAIL: expected $expected, received $received"
+  fi
 }

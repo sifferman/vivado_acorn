@@ -15,16 +15,19 @@ This project includes multiple Vivado Block Design-based projects of varying com
 
 ```bash
 # Use bd/pcie_bram.tcl
-make pcie_bram_program
+make pcie_bram_program && sudo reboot
 vivado build/pcie_bram/acorn.xpr
+source xdma_helpers.sh && test_pcie_bram
 
 # Use bd/pcie_ddr3.tcl
-dmake pcie_ddr3_program
+dmake pcie_ddr3_program && sudo reboot
 vivado build/pcie_ddr3/acorn.xpr
+source xdma_helpers.sh && test_pcie_ddr3
 
 # Use bd/pcie_ddr3_rtl.tcl
-make pcie_ddr3_rtl_program
+make pcie_ddr3_rtl_program && sudo reboot
 vivado build/pcie_ddr3_rtl/acorn.xpr
+source xdma_helpers.sh && test_pcie_ddr3_rtl
 
 # etc...
 ```
@@ -104,6 +107,8 @@ ls /dev/xdma*
 
 ### Example Transfers
 
+Feel free to use the helper functions in `"xdma_helpers.sh"`. Or you may run the commands manually with:
+
 ```bash
 cd dma_ip_drivers/XDMA/linux-kernel/tools
 make
@@ -119,7 +124,4 @@ dd if=/dev/urandom of=TEST512M bs=1M count=512
 sudo ./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --size $((512*1024*1024)) -f TEST512M
 sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((512*1024*1024)) --file RECV512M
 cmp -b TEST512M RECV512M
-
-# Test bd/pcie_mm2s_rtl.tcl
-source xdma_helpers.sh && test_pcie_mm2s_rtl beefcafe
 ```
