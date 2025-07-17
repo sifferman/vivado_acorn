@@ -44,7 +44,7 @@ set_property -dict [list \
   CONFIG.NUM_MI {2} \
   CONFIG.NUM_SI {1} \
 ] [get_bd_cells axi_interconnect_0]
-connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] -boundary_type upper [get_bd_intf_pins axi_interconnect_0/S00_AXI]
+connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
 
 ##############
 # RTL

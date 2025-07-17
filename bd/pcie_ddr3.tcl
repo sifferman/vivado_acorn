@@ -38,6 +38,14 @@ connect_bd_net [get_bd_ports pcie_x4_rx_n] [get_bd_pins xdma_0/pci_exp_rxn]
 connect_bd_net [get_bd_ports pcie_x4_tx_p] [get_bd_pins xdma_0/pci_exp_txp]
 connect_bd_net [get_bd_ports pcie_x4_tx_n] [get_bd_pins xdma_0/pci_exp_txn]
 
+# Buffer the XDMA port
+create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
+set_property -dict [list \
+  CONFIG.NUM_MI {1} \
+  CONFIG.NUM_SI {1} \
+] [get_bd_cells axi_interconnect_0]
+connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
+
 ##############
 # DDR3
 ##############
@@ -50,24 +58,45 @@ make_bd_intf_pins_external [get_bd_intf_pins mig_7series_0/DDR3]
 # Disable MIG Reset
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_1
 set_property CONFIG.CONST_VAL {1} [get_bd_cells xlconstant_1]
-connect_bd_net [get_bd_pins xlconstant_1/dout] [get_bd_pins mig_7series_0/aresetn]
-connect_bd_net [get_bd_pins mig_7series_0/sys_rst] [get_bd_pins xlconstant_1/dout]
 
 # MIG CLK
 make_bd_intf_pins_external [get_bd_intf_pins mig_7series_0/SYS_CLK]
 set_property NAME DDR_CLK [get_bd_intf_ports /SYS_CLK_0]
 
 # PCIe -> MIG
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
-  Clk_master {/xdma_0/axi_aclk (125 MHz)} \
-  Clk_slave {/mig_7series_0/ui_clk (200 MHz)} \
-  Clk_xbar {Auto} \
-  Master {/xdma_0/M_AXI} \
-  Slave {/mig_7series_0/S_AXI} \
-  ddr_seg {Auto} \
-  intc_ip {New AXI SmartConnect} \
-  master_apm {0} \
-} [get_bd_intf_pins mig_7series_0/S_AXI]
+connect_bd_intf_net [get_bd_intf_pins mig_7series_0/S_AXI] [get_bd_intf_pins axi_interconnect_0/M00_AXI]
+
+# Reset
+create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 util_vector_logic_0
+set_property -dict [list \
+  CONFIG.C_OPERATION {not} \
+  CONFIG.C_SIZE {1} \
+] [get_bd_cells util_vector_logic_0]
+
+##############
+# Clocks
+##############
+
+connect_bd_net [get_bd_pins mig_7series_0/ui_clk] \
+               [get_bd_pins axi_interconnect_0/M00_ACLK]
+
+connect_bd_net [get_bd_pins util_vector_logic_0/Op1] \
+               [get_bd_pins mig_7series_0/ui_clk_sync_rst]
+
+connect_bd_net [get_bd_pins util_vector_logic_0/Res] \
+               [get_bd_pins axi_interconnect_0/M00_ARESETN]
+
+connect_bd_net [get_bd_pins xlconstant_1/dout] \
+               [get_bd_pins mig_7series_0/aresetn] \
+               [get_bd_pins mig_7series_0/sys_rst]
+
+connect_bd_net [get_bd_pins xdma_0/axi_aclk] \
+               [get_bd_pins axi_interconnect_0/ACLK] \
+               [get_bd_pins axi_interconnect_0/S00_ACLK]
+
+connect_bd_net [get_bd_pins xdma_0/axi_aresetn] \
+               [get_bd_pins axi_interconnect_0/ARESETN] \
+               [get_bd_pins axi_interconnect_0/S00_ARESETN]
 
 ##############
 # AXI Addresses

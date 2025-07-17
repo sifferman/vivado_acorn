@@ -44,11 +44,7 @@ set_property -dict [list \
   CONFIG.NUM_MI {2} \
   CONFIG.NUM_SI {1} \
 ] [get_bd_cells axi_interconnect_0]
-connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] -boundary_type upper [get_bd_intf_pins axi_interconnect_0/S00_AXI]
-connect_bd_net [get_bd_pins xdma_0/axi_aclk] [get_bd_pins axi_interconnect_0/S00_ACLK]
-connect_bd_net [get_bd_pins xdma_0/axi_aresetn] [get_bd_pins axi_interconnect_0/S00_ARESETN]
-connect_bd_net [get_bd_pins xdma_0/axi_aclk] [get_bd_pins axi_interconnect_0/ACLK]
-connect_bd_net [get_bd_pins xdma_0/axi_aresetn] [get_bd_pins axi_interconnect_0/ARESETN]
+connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
 
 ##############
 # DDR3
@@ -62,8 +58,6 @@ make_bd_intf_pins_external [get_bd_intf_pins mig_7series_0/DDR3]
 # Disable MIG Reset
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_1
 set_property CONFIG.CONST_VAL {1} [get_bd_cells xlconstant_1]
-connect_bd_net [get_bd_pins xlconstant_1/dout] [get_bd_pins mig_7series_0/aresetn]
-connect_bd_net [get_bd_pins mig_7series_0/sys_rst] [get_bd_pins xlconstant_1/dout]
 
 # MIG CLK
 make_bd_intf_pins_external [get_bd_intf_pins mig_7series_0/SYS_CLK]
@@ -71,15 +65,13 @@ set_property NAME DDR_CLK [get_bd_intf_ports /SYS_CLK_0]
 
 # PCIe -> MIG
 connect_bd_intf_net [get_bd_intf_pins mig_7series_0/S_AXI] [get_bd_intf_pins axi_interconnect_0/M00_AXI]
-connect_bd_net [get_bd_pins mig_7series_0/ui_clk] [get_bd_pins axi_interconnect_0/M00_ACLK]
 
+# Reset
 create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 util_vector_logic_0
 set_property -dict [list \
   CONFIG.C_OPERATION {not} \
   CONFIG.C_SIZE {1} \
 ] [get_bd_cells util_vector_logic_0]
-connect_bd_net [get_bd_pins mig_7series_0/ui_clk_sync_rst] [get_bd_pins util_vector_logic_0/Op1]
-connect_bd_net [get_bd_pins util_vector_logic_0/Res] [get_bd_pins axi_interconnect_0/M00_ARESETN]
 
 ##############
 # RTL
@@ -87,15 +79,40 @@ connect_bd_net [get_bd_pins util_vector_logic_0/Res] [get_bd_pins axi_interconne
 
 create_bd_cell -type module -reference axi_const_rd axi_const_rd
 set_property -dict [list \
-  CONFIG.DATA_WIDTH {128} \
+  CONFIG.DATA_WIDTH {32} \
   CONFIG.ADDR_WIDTH {64} \
   CONFIG.CONST_DATA {0xbeefcafe} \
 ] [get_bd_cells axi_const_rd]
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M01_AXI] [get_bd_intf_pins axi_const_rd/s_axi]
-connect_bd_net [get_bd_pins axi_const_rd/axi_clk] [get_bd_pins xdma_0/axi_aclk]
-connect_bd_net [get_bd_pins axi_const_rd/axi_resetn] [get_bd_pins xdma_0/axi_aresetn]
-connect_bd_net [get_bd_pins axi_const_rd/axi_clk] [get_bd_pins axi_interconnect_0/M01_ACLK]
-connect_bd_net [get_bd_pins axi_const_rd/axi_resetn] [get_bd_pins axi_interconnect_0/M01_ARESETN]
+
+##############
+# Clocks
+##############
+
+connect_bd_net [get_bd_pins mig_7series_0/ui_clk] \
+               [get_bd_pins axi_interconnect_0/M00_ACLK]
+
+connect_bd_net [get_bd_pins util_vector_logic_0/Op1] \
+               [get_bd_pins mig_7series_0/ui_clk_sync_rst]
+
+connect_bd_net [get_bd_pins util_vector_logic_0/Res] \
+               [get_bd_pins axi_interconnect_0/M00_ARESETN]
+
+connect_bd_net [get_bd_pins xlconstant_1/dout] \
+               [get_bd_pins mig_7series_0/aresetn] \
+               [get_bd_pins mig_7series_0/sys_rst]
+
+connect_bd_net [get_bd_pins axi_const_rd/axi_clk] \
+               [get_bd_pins xdma_0/axi_aclk] \
+               [get_bd_pins axi_interconnect_0/ACLK] \
+               [get_bd_pins axi_interconnect_0/S00_ACLK] \
+               [get_bd_pins axi_interconnect_0/M01_ACLK]
+
+connect_bd_net [get_bd_pins axi_const_rd/axi_resetn] \
+               [get_bd_pins xdma_0/axi_aresetn] \
+               [get_bd_pins axi_interconnect_0/ARESETN] \
+               [get_bd_pins axi_interconnect_0/S00_ARESETN] \
+               [get_bd_pins axi_interconnect_0/M01_ARESETN]
 
 ##############
 # AXI Addresses
