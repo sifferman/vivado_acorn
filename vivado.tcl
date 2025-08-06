@@ -22,7 +22,7 @@ set_property PROCESSING_ORDER EARLY [get_files -of_objects [get_filesets constrs
 create_bd_design "design_1"
 source ../$bd_tcl_filename
 save_bd_design
-make_wrapper -files [get_files $project_name/acorn.srcs/sources_1/bd/design_1/design_1.bd] -top -import
+make_wrapper -files [get_files design_1.bd] -top -import
 set_property top design_1_wrapper [current_fileset]
 
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
