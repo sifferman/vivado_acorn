@@ -1,7 +1,7 @@
 
 # Sqrl Acorn FPGA Example
 
-The [LiteFury and NiteFury PCIe FPGA](https://github.com/RHSResearchLLC/NiteFury-and-LiteFury) boards are some of the most affordable PCIe FPGA development platforms available. The cryptocurrency company SQRL licensed and re-released the designs as the Acorn CLE-101, CLE-215, and CLE-215+. Although all five boards are now discontinued, they are still readily available on eBay.
+The [RHS LiteFury, RHS NiteFury, and RHS NiteFury II PCIe FPGA](https://github.com/RHSResearchLLC/NiteFury-and-LiteFury) boards are some of the most affordable PCIe FPGA development platforms available. The cryptocurrency company SQRL licensed and re-released the designs as the Acorn CLE-101, CLE-215, and CLE-215+. Although all six boards are now discontinued, they are often available second-hand.
 
 ![LiteFury](https://raw.githubusercontent.com/RHSResearchLLC/NiteFury-and-LiteFury/701716e3ccf9a7613e425db4bb4faeb7615c30c5/images/lf-hero-cropped.PNG)
 
@@ -125,3 +125,11 @@ sudo ./dma_to_device --verbose --device /dev/xdma0_h2c_0 --address 0x00000000 --
 sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x00000000 --size $((512*1024*1024)) --file RECV512M
 cmp -b TEST512M RECV512M
 ```
+
+## Board Differences
+
+| Board                           | FPGA Part         | Memory                      |
+|---------------------------------|-------------------|-----------------------------|
+| RHS LiteFury / Acorn CLE101     | xc7a100tfgg484-2L | 512MB DDR3-800              |
+| RHS NiteFury / Acorn CLE215     | xc7a200tfbg484-2  | 512MB DDR3-800              |
+| RHS NiteFury II / Acorn CLE215+ | xc7a200tfbg484-3  | 1GB DDR3-1066 (MT41K512M16) |
