@@ -15,9 +15,9 @@
 
   <LowPower_En>ON</LowPower_En>
 
-  <XADC_En>Disabled</XADC_En>
+  <XADC_En>Enabled</XADC_En>
 
-  <TargetFPGA>xc7a100t-fgg484/-3</TargetFPGA>
+  <TargetFPGA>xc7a200t-fbg484/-3</TargetFPGA>
 
   <Version>4.2</Version>
 
@@ -36,11 +36,11 @@
   <dci_cascade>0</dci_cascade>
 
   <Controller number="0">
-    <MemoryDevice>DDR3_SDRAM/Components/MT41J256m16XX-125</MemoryDevice>
+    <MemoryDevice>DDR3_SDRAM/Components/MT41K256M16XX-125</MemoryDevice>
     <TimePeriod>2500</TimePeriod>
     <VccAuxIO>1.8V</VccAuxIO>
-    <PHYRatio>2:1</PHYRatio>
-    <InputClkFreq>200</InputClkFreq>
+    <PHYRatio>4:1</PHYRatio>
+    <InputClkFreq>400</InputClkFreq>
     <UIExtraClocks>0</UIExtraClocks>
     <MMCM_VCO>800</MMCM_VCO>
     <MMCMClkOut0> 1.000</MMCMClkOut0>
@@ -54,13 +54,13 @@
     <ECC>Disabled</ECC>
     <Ordering>Strict</Ordering>
     <BankMachineCnt>4</BankMachineCnt>
-    <CustomPart>FALSE</CustomPart>
-    <NewPartName></NewPartName>
-    <RowAddress>15</RowAddress>
+    <CustomPart>TRUE</CustomPart>
+    <NewPartName>MT41K512M16XX-125</NewPartName>
+    <RowAddress>16</RowAddress>
     <ColAddress>10</ColAddress>
     <BankAddress>3</BankAddress>
     <MemoryVoltage>1.5V</MemoryVoltage>
-    <C0_MEM_SIZE>536870912</C0_MEM_SIZE>
+    <C0_MEM_SIZE>1073741824</C0_MEM_SIZE>
     <UserMemoryAddressMap>BANK_ROW_COLUMN</UserMemoryAddressMap>
     <PinSelection>
       <Pin IN_TERM="" IOSTANDARD="SSTL15" PADName="M15" SLEW="" VCCAUX_IO="" name="ddr3_addr[0]"/>
@@ -147,8 +147,8 @@
     <PortInterface>AXI</PortInterface>
     <AXIParameters>
       <C0_C_RD_WR_ARB_ALGORITHM>RD_PRI_REG</C0_C_RD_WR_ARB_ALGORITHM>
-      <C0_S_AXI_ADDR_WIDTH>29</C0_S_AXI_ADDR_WIDTH>
-      <C0_S_AXI_DATA_WIDTH>64</C0_S_AXI_DATA_WIDTH>
+      <C0_S_AXI_ADDR_WIDTH>30</C0_S_AXI_ADDR_WIDTH>
+      <C0_S_AXI_DATA_WIDTH>128</C0_S_AXI_DATA_WIDTH>
       <C0_S_AXI_ID_WIDTH>4</C0_S_AXI_ID_WIDTH>
       <C0_S_AXI_SUPPORTS_NARROW_BURST>0</C0_S_AXI_SUPPORTS_NARROW_BURST>
     </AXIParameters>

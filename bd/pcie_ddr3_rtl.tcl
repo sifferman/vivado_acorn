@@ -52,7 +52,7 @@ connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] [get_bd_intf_pins axi_interc
 
 # MIG
 create_bd_cell -type ip -vlnv xilinx.com:ip:mig_7series:4.2 mig_7series_0
-set_property CONFIG.XML_INPUT_FILE [pwd]/../mig_a.prj [get_bd_cells mig_7series_0]
+set_property CONFIG.XML_INPUT_FILE [pwd]/../mig_$variant.prj [get_bd_cells mig_7series_0]
 make_bd_intf_pins_external [get_bd_intf_pins mig_7series_0/DDR3]
 
 # Disable MIG Reset
@@ -119,7 +119,7 @@ connect_bd_net [get_bd_pins axi_const_rd/axi_resetn] \
 ##############
 
 create_bd_addr_seg \
-  -range 512M -offset 0x00000000 \
+  -range $dram_size -offset 0x00000000 \
   [get_bd_addr_spaces {/xdma_0/M_AXI}] \
   [get_bd_addr_segs {/mig_7series_0/memmap/memaddr}] \
   SEG_mig_7series

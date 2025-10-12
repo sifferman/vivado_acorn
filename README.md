@@ -14,6 +14,8 @@ The easiest way to get started is to purchase the [LiteX Acorn Baseboard Mini](h
 This project includes multiple Vivado Block Design-based projects of varying complexity:
 
 ```bash
+# RHS LiteFury / Acorn CLE101
+
 # Use bd/pcie_bram.tcl
 make pcie_bram_program && sudo reboot
 vivado build/pcie_bram/acorn.xpr
@@ -28,6 +30,24 @@ source xdma_helpers.sh && test_pcie_ram 512M
 make pcie_ddr3_rtl_program && sudo reboot
 vivado build/pcie_ddr3_rtl/acorn.xpr
 source xdma_helpers.sh && test_pcie_rtl && test_pcie_ram 512M
+
+
+# RHS NiteFury II / Acorn CLE215+
+
+# Use bd/pcie_bram.tcl
+make pcie_bram_program VARIANT=cle215+ && sudo reboot
+vivado build/pcie_bram/acorn.xpr
+source xdma_helpers.sh && test_pcie_ram 8K
+
+# Use bd/pcie_ddr3.tcl
+make pcie_ddr3_program VARIANT=cle215+ && sudo reboot
+vivado build/pcie_ddr3/acorn.xpr
+source xdma_helpers.sh && test_pcie_ram 1G
+
+# Use bd/pcie_ddr3_rtl.tcl
+make pcie_ddr3_rtl_program VARIANT=cle215+ && sudo reboot
+vivado build/pcie_ddr3_rtl/acorn.xpr
+source xdma_helpers.sh && test_pcie_rtl && test_pcie_ram 1G
 
 # etc...
 ```

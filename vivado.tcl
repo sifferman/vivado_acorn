@@ -1,10 +1,13 @@
 
 set project_name [lindex $argv 0]
-set bd_tcl_filename [lindex $argv 1]
+set variant [lindex $argv 1]
+set part_name [lindex $argv 2]
+set dram_size [lindex $argv 3]
+set bd_tcl_filename [lindex $argv 4]
 
 # start_gui
 
-create_project acorn $project_name/ -part xc7a100tfgg484
+create_project acorn_$variant $project_name/ -part $part_name
 
 # add_files -norecurse {}
 # set_property file_type {Memory File} [get_files -all]
