@@ -84,29 +84,30 @@ xdma_h2c_int32() {
   return $rc
 }
 
-test_pcie_bram() {
-  dd if=/dev/urandom of=TEST8K bs=$((8*1024)) count=1
-  xdma_h2c_file 0x0 TEST8K
-  xdma_c2h_file 0x0 RECV8K $((8*1024))
-  cmp -b TEST8K RECV8K
-  rm -rf TEST8K RECV8K
+test_pcie_ram() {
+  # Accepts sizes like: 8K, 512, 2M, 1G
+  local size="$1"
+  if [ -z "$size" ]; then
+    echo "Usage: test_pcie_bram <size>[K|M|G]"
+    return 1
+  fi
+
+  if ! size_bytes=$(numfmt --from=iec "$size" 2>/dev/null); then
+    echo "Invalid size: '$size'"
+    return 2
+  fi
+
+  local test_file="TEST${size}"
+  local recv_file="RECV${size}"
+
+  dd if=/dev/urandom of="$test_file" bs="$size_bytes" count=1
+  xdma_h2c_file 0x0 "$test_file"
+  xdma_c2h_file 0x0 "$recv_file" "$size_bytes"
+  cmp -b "$test_file" "$recv_file" && echo "PASS: $test_file matches $recv_file"
+  rm -f "$test_file" "$recv_file"
 }
 
-test_pcie_ddr3() {
-  dd if=/dev/urandom of=TEST512M bs=$((512*1024*1024)) count=1
-  xdma_h2c_file 0x0 TEST512M
-  xdma_c2h_file 0x0 RECV512M $((512*1024*1024))
-  cmp -b TEST512M RECV512M
-  rm -rf TEST512M RECV512M
-}
-
-test_pcie_ddr3_rtl() {
-  dd if=/dev/urandom of=TEST512M bs=$((512*1024*1024)) count=1
-  xdma_h2c_file 0x0 TEST512M
-  xdma_c2h_file 0x0 RECV512M $((512*1024*1024))
-  cmp -b TEST512M RECV512M
-  rm -rf TEST512M RECV512M
-
+test_pcie_rtl() {
   expected="beefcafe"
   received=$(xdma_c2h_int32 0x80000000 | tr -d ' \n')
   if [[ "$received" == "$expected" ]]; then

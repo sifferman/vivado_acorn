@@ -17,17 +17,17 @@ This project includes multiple Vivado Block Design-based projects of varying com
 # Use bd/pcie_bram.tcl
 make pcie_bram_program && sudo reboot
 vivado build/pcie_bram/acorn.xpr
-source xdma_helpers.sh && test_pcie_bram
+source xdma_helpers.sh && test_pcie_ram 8K
 
 # Use bd/pcie_ddr3.tcl
 dmake pcie_ddr3_program && sudo reboot
 vivado build/pcie_ddr3/acorn.xpr
-source xdma_helpers.sh && test_pcie_ddr3
+source xdma_helpers.sh && test_pcie_ram 512M
 
 # Use bd/pcie_ddr3_rtl.tcl
 make pcie_ddr3_rtl_program && sudo reboot
 vivado build/pcie_ddr3_rtl/acorn.xpr
-source xdma_helpers.sh && test_pcie_ddr3_rtl
+source xdma_helpers.sh && test_pcie_rtl && test_pcie_ram 512M
 
 # etc...
 ```
