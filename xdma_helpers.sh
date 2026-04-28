@@ -88,7 +88,7 @@ test_pcie_ram() {
   # Accepts sizes like: 8K, 512, 2M, 1G
   local size="$1"
   if [ -z "$size" ]; then
-    echo "Usage: test_pcie_bram <size>[K|M|G]"
+    echo "Usage: test_pcie_ram <size>[K|M|G]"
     return 1
   fi
 

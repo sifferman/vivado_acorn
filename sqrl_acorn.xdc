@@ -8,7 +8,7 @@
 # repurposed as generic FPGA PCIe development boards:
 # - http://www.squirrelsresearch.com/acorn-cle-101
 # - http://www.squirrelsresearch.com/acorn-cle-215-plus
-# The 101 variant is eguivalent to the LiteFury and 215 variant equivalent to the NiteFury from
+# The 101 variant is equivalent to the LiteFury and 215 variant equivalent to the NiteFury from
 # RHSResearchLLC that are documented at: https://github.com/RHSResearchLLC/NiteFury-and-LiteFury.
 
 # https://github.com/litex-hub/litex-boards/blob/master/litex_boards/platforms/sqrl_acorn.py

@@ -22,7 +22,7 @@ vivado build/pcie_bram/acorn.xpr
 source xdma_helpers.sh && test_pcie_ram 8K
 
 # Use bd/pcie_ddr3.tcl
-dmake pcie_ddr3_program && sudo reboot
+make pcie_ddr3_program && sudo reboot
 vivado build/pcie_ddr3/acorn.xpr
 source xdma_helpers.sh && test_pcie_ram 512M
 
@@ -68,15 +68,15 @@ Because Thunderbolt 3/4 enclosures are quite expensive, laptop users may choose 
 
 ### General Notes
 
-Note that every time you program the FPGA, you must reboot your computer. The FPGA's volatile memory will be preserved if the FPGA doesn't loose power during the reboot. Otherwise, consider flashing the on-board non-volatile memory.
+Note that every time you program the FPGA, you must reboot your computer. The FPGA's volatile memory will be preserved if the FPGA doesn't lose power during the reboot. Otherwise, consider flashing the on-board non-volatile memory.
 
 ### Programming Over JTAG
 
-Note that to program the board, you first need to power it with an aformentioned method. JTAG does not provide power.
+Note that to program the board, you first need to power it with an aforementioned method. JTAG does not provide power.
 
 The easiest method of programming the board is with the [LiteX Acorn Baseboard Mini](https://enjoy-digital-shop.myshopify.com/products/litex-acorn-baseboard-mini).
 
-Otherwise, the Acorn board exposes a JTAG interface which can be programmed via a JTAG programmer, such as the [Digilent HS2](https://www.digikey.fr/fr/product-highlight/d/digilent/jtag-hs2-programming-cable). Unfortunetly, the connector is not a standard 7-pin 2mm port, but is instead a Molex PicoEzMate 6. An explanation of how to make an adapter is explained here: [Use LiteX on the Acorn CLE 215](https://github.com/enjoy-digital/litex/wiki/Use-LiteX-on-the-Acorn-CLE-215).
+Otherwise, the Acorn board exposes a JTAG interface which can be programmed via a JTAG programmer, such as the [Digilent HS2](https://www.digikey.fr/fr/product-highlight/d/digilent/jtag-hs2-programming-cable). Unfortunately, the connector is not a standard 7-pin 2mm port, but is instead a Molex PicoEzMate 6. An explanation of how to make an adapter is explained here: [Use LiteX on the Acorn CLE 215](https://github.com/enjoy-digital/litex/wiki/Use-LiteX-on-the-Acorn-CLE-215).
 
 Once the board is connected, ensure that you have installed the cable drivers. Then the FPGA should appear in Vivado's Hardware Manager.
 

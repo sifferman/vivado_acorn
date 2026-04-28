@@ -18,6 +18,8 @@ ifeq ($(VARIANT), cle215+)
     DRAM_SIZE = 1G
 endif
 
+.SECONDARY:
+
 build/vivado-program.tcl:
 	mkdir -p $(dir $@)
 	wget -O $@ https://raw.githubusercontent.com/olofk/edalize/refs/tags/v0.6.1/edalize/templates/vivado/vivado-program.tcl.j2
