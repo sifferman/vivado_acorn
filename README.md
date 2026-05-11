@@ -115,9 +115,9 @@ Now, you should be all set to load the driver module and connect to the FPGA via
 
 ```bash
 # unload driver (if needed)
-rmmod xdma
+sudo rmmod xdma
 # load driver
-modprobe xdma
+sudo modprobe xdma
 
 # Ensure that the driver and FPGA are working
 dmesg | grep -i xdma
